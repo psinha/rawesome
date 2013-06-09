@@ -2,8 +2,8 @@ clear all
 close all
 clc
 
-adat = aerodata
-
+adat = aerodata();
+a=aerodata();
 n = length(adat.Alpha);
 
 % names = [%{'CL_tot','CL'};
@@ -43,7 +43,7 @@ ylabel('beta')
 zlabel('CL')
 
 
-% fit quadratic CD alpha
+% fit quadratic CD alpha/beta
 alpha = zeros(0,0);
 beta  = zeros(0,0);
 CD    = zeros(0,0);
@@ -54,18 +54,43 @@ for k=1:n
         CD = [CD; adat.CD_tot(k)];
     end
 end
-M = [(alpha*pi/180).^2, (alpha*pi/180), ones(length(alpha),1)];
+M = [(alpha*pi/180).^2, (alpha*pi/180), (beta*pi/180).^2, ones(length(alpha),1)];
 res = M\CD;
-fprintf('CD = %f*alpha^2 + %f*alpha + %f\n', res)
+fprintf('CD = %f*alpha^2 + %f*alpha + %f*beta^2 + %f\n', res)
 
 figure()
 plot3(adat.Alpha, adat.Beta, adat.CD_tot,'b.')
 hold on
-M = [(adat.Alpha*pi/180).^2, (adat.Alpha*pi/180), ones(n,1)];
+M = [(adat.Alpha*pi/180).^2, (adat.Alpha*pi/180), (adat.Beta*pi/180).^2, ones(n,1)];
 plot3(adat.Alpha, adat.Beta, M*res,'r.')
 xlabel('alpha')
 ylabel('beta')
 zlabel('CD')
+
+
+% fit quadratic CY alpha/beta
+alpha = zeros(0,0);
+beta  = zeros(0,0);
+CY    = zeros(0,0);
+for k=1:n
+    if adat.Alpha(k) >= -4.5 && adat.Alpha(k) <= 9.5
+        alpha = [alpha; adat.Alpha(k)];
+        beta = [beta; adat.Beta(k)];
+        CY = [CY; adat.CY_tot(k)];
+    end
+end
+M = [(alpha*pi/180).^2, (alpha*pi/180), (beta*pi/180), ones(length(alpha),1)];
+res = M\CY;
+fprintf('CY = %f*alpha^2 + %f*alpha + %f*beta + %f\n', res)
+
+figure()
+plot3(adat.Alpha, adat.Beta, adat.CY_tot,'b.')
+hold on
+M = [(adat.Alpha*pi/180).^2, (adat.Alpha*pi/180), (adat.Beta*pi/180), ones(n,1)];
+plot3(adat.Alpha, adat.Beta, M*res,'r.')
+xlabel('alpha')
+ylabel('beta')
+zlabel('CY')
 
 
 % fit linear Cm alpha
