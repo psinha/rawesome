@@ -144,3 +144,35 @@ plot3(adat.Alpha, adat.Beta, M*res,'r.')
 xlabel('alpha')
 ylabel('beta')
 zlabel('Cn')
+
+
+
+% fit linear Cd_dflaps
+M = [adat.Flap, adat.Alpha, ones(n,1)];
+res = M\adat.CD_ff_d3;
+fprintf('CD_dflaps = %g*flaps + %g*alpha + %g\n', res)
+fprintf('CD_flaps = %g*flaps^2 + %g*alpha*delta + %g*delta\n',res(1)*0.5, res(2), res(3))
+
+figure()
+plot3(adat.Alpha, adat.Flap, adat.CD_ff_d3,'b.')
+hold on
+plot3(adat.Alpha, adat.Flap, M*res,'r.')
+xlabel('alpha')
+ylabel('flaps')
+zlabel('CD_dflaps')
+
+% integrate previous fit analytically, plot result
+alphas = [];
+deltas = [];
+drags = [];
+for alpha=linspace(-4,8,20)
+    for delta=linspace(-6,6,20);
+        alphas = [alphas, alpha];
+        deltas = [deltas, delta];
+        drags = [drags,res(1)*0.5*delta.^2 + res(2)*alpha*delta + res(3)*delta];
+    end
+end
+figure()
+plot3(alphas,deltas,drags,'b.')
+xlabel('alpha');ylabel('delta');zlabel('CD_flaps');
+grid on
