@@ -2,8 +2,8 @@ clear all
 close all
 clc
 
-adat = aerodata();
-a=aerodata();
+adat = aerodata_ariane();
+%a=aerodata();
 n = length(adat.Alpha);
 
 % names = [%{'CL_tot','CL'};
