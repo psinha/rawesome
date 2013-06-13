@@ -2,7 +2,7 @@ clear all
 close all
 clc
 
-adat = aerodata_ariane();
+adat = aerodata();
 %a=aerodata();
 n = length(adat.Alpha);
 
@@ -149,12 +149,12 @@ zlabel('Cn')
 
 % fit linear Cd_dflaps
 M = [adat.Flap, adat.Alpha, ones(n,1)];
-res = M\adat.CD_ff_d3;
+res = M\adat.CD_ff_d1;
 fprintf('CD_dflaps = %g*flaps + %g*alpha + %g\n', res)
 fprintf('CD_flaps = %g*flaps^2 + %g*alpha*delta + %g*delta\n',res(1)*0.5, res(2), res(3))
 
 figure()
-plot3(adat.Alpha, adat.Flap, adat.CD_ff_d3,'b.')
+plot3(adat.Alpha, adat.Flap, adat.CD_ff_d1,'b.')
 hold on
 plot3(adat.Alpha, adat.Flap, M*res,'r.')
 xlabel('alpha')
@@ -175,4 +175,95 @@ end
 figure()
 plot3(alphas,deltas,drags,'b.')
 xlabel('alpha');ylabel('delta');zlabel('CD_flaps');
+grid on
+
+
+% fit linear Cd_delev
+M = [adat.Elevator, adat.Alpha, ones(n,1)];
+res = M\adat.CD_ff_d3;
+fprintf('CD_dElevator = %g*Elevator + %g*alpha + %g\n', res)
+fprintf('CD_Elevator = %g*Elevator^2 + %g*alpha*delta + %g*delta\n',res(1)*0.5, res(2), res(3))
+
+figure()
+plot3(adat.Alpha, adat.Elevator, adat.CD_ff_d3,'b.')
+hold on
+plot3(adat.Alpha, adat.Elevator, M*res,'r.')
+xlabel('alpha')
+ylabel('elevator')
+zlabel('CD_dElevator')
+
+% integrate previous fit analytically, plot result
+alphas = [];
+deltas = [];
+drags = [];
+for alpha=linspace(-4,8,20)
+    for delta=linspace(-6,6,20);
+        alphas = [alphas, alpha];
+        deltas = [deltas, delta];
+        drags = [drags,res(1)*0.5*delta.^2 + res(2)*alpha*delta + res(3)*delta];
+    end
+end
+figure()
+plot3(alphas,deltas,drags,'b.')
+xlabel('alpha');ylabel('delta');zlabel('CD_Elevator');
+grid on
+
+% fit linear Cd_dail
+M = [adat.Aileron, adat.Beta, ones(n,1)];
+res = M\adat.CD_ff_d2;
+fprintf('CD_dAileron = %g*Aileron + %g*beta + %g\n', res)
+fprintf('CD_Aileron = %g*Aileron^2 + %g*beta*delta + %g*delta\n',res(1)*0.5, res(2), res(3))
+
+figure()
+plot3(adat.Beta, adat.Aileron, adat.CD_ff_d2,'b.')
+hold on
+plot3(adat.Beta, adat.Aileron, M*res,'r.')
+xlabel('Beta')
+ylabel('Aileron')
+zlabel('CD_dAileron')
+
+% integrate previous fit analytically, plot result
+alphas = [];
+deltas = [];
+drags = [];
+for alpha=linspace(-8,8,20)
+    for delta=linspace(-6,6,20);
+        alphas = [alphas, alpha];
+        deltas = [deltas, delta];
+        drags = [drags,res(1)*0.5*delta.^2 + res(2)*alpha*delta + res(3)*delta];
+    end
+end
+figure()
+plot3(alphas,deltas,drags,'b.')
+xlabel('beta');ylabel('delta');zlabel('CD_Aileron');
+grid on
+
+% fit linear Cd_drud
+M = [adat.Rudder, adat.Beta, ones(n,1)];
+res = M\adat.CD_ff_d4;
+fprintf('CD_dRudder = %g*Rudder + %g*beta + %g\n', res)
+fprintf('CD_Rudder = %g*Rudder^2 + %g*beta*delta + %g*delta\n',res(1)*0.5, res(2), res(3))
+
+figure()
+plot3(adat.Beta, adat.Rudder, adat.CD_ff_d4,'b.')
+hold on
+plot3(adat.Beta, adat.Rudder, M*res,'r.')
+xlabel('Beta')
+ylabel('Rudder')
+zlabel('CD_dRudder')
+
+% integrate previous fit analytically, plot result
+alphas = [];
+deltas = [];
+drags = [];
+for alpha=linspace(-8,8,20)
+    for delta=linspace(-6,6,20);
+        alphas = [alphas, alpha];
+        deltas = [deltas, delta];
+        drags = [drags,res(1)*0.5*delta.^2 + res(2)*alpha*delta + res(3)*delta];
+    end
+end
+figure()
+plot3(alphas,deltas,drags,'b.')
+xlabel('beta');ylabel('delta');zlabel('CD_Rudder');
 grid on
